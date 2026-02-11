@@ -1,35 +1,47 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useMemo, useState } from "react";
+import { fetchStations } from "./api/stations";
+import type { Station } from "./types/station";
+import MapView from "./components/MapView";
+import StationList from "./components/StationList";
+import CityFilter from "./components/CityFilter";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [stations, setStations] = useState<Station[]>([]);
+  const [city, setCity] = useState("");
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetchStations()
+      .then(setStations)
+      .catch(() => setError("Could not load stations"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filteredStations = useMemo(() => {
+    if (!city) return stations;
+    return stations.filter((s) =>
+      s.city.toLowerCase().includes(city.toLowerCase())
+    );
+  }, [stations, city]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="grid grid-cols-3 h-screen">
+      <div className="col-span-1 p-4">
+        <CityFilter value={city} onChange={setCity} />
+        <StationList stations={filteredStations} onSelect={setSelectedId} />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+
+      <div className="col-span-2">
+        <MapView stations={filteredStations} selectedId={selectedId} />
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
