@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useRef } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import {  MapContainer, TileLayer, Marker, Popup , useMap } from "react-leaflet";
 import type { Station } from "../types/station";
 import type { Marker as LeafletMarker } from "leaflet";
 import L from "leaflet";
-
+import {} from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 // Fix marker icons for Vite
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
 
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
